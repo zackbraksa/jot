@@ -10,6 +10,8 @@
 
 Unzip the download and move **Jot.app** to **Applications**.
 
+![Jot’s note editor with sample weekend plans](docs/screenshots/jot-demo.png)
+
 Use Jot for a thought you want to keep, a bit of text you need to paste again, or a draft you’ll come back to. Click the menu bar icon to open your note and press <kbd>Esc</kbd> to get back to what you were doing.
 
 Jot saves as you type. Your note stays on your Mac as a plain-text file.
