@@ -3,6 +3,12 @@
 </p>
 <h1 align="center">Jot</h1>
 <p align="center"><strong>One note, right in your Mac menu bar.</strong></p>
+<p align="center">
+  <strong><a href="https://github.com/zackbraksa/jot/releases/download/v1.0.0/Jot-1.0-macOS.zip">Download Jot for macOS</a></strong><br>
+  macOS 14 or later · Apple silicon and Intel
+</p>
+
+Unzip the download and move **Jot.app** to **Applications**.
 
 Use Jot for a thought you want to keep, a bit of text you need to paste again, or a draft you’ll come back to. Click the menu bar icon to open your note and press <kbd>Esc</kbd> to get back to what you were doing.
 
