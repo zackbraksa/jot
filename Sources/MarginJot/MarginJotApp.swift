@@ -1,4 +1,5 @@
 import AppKit
+import Sparkle
 import SwiftUI
 
 @main
@@ -14,11 +15,22 @@ enum MarginJotApp {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSMenuItemValidation {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let popover = NSPopover()
     private let note = Note()
     private let focus = EditorFocus()
+    private let updater: SPUStandardUpdaterController? = {
+        let info = Bundle.main.infoDictionary ?? [:]
+        guard info["SparkleUpdatesEnabled"] as? Bool == true,
+              let feed = info["SUFeedURL"] as? String,
+              let url = URL(string: feed), url.scheme?.lowercased() == "https",
+              url.host != nil, url.user == nil, url.password == nil,
+              let key = info["SUPublicEDKey"] as? String, Data(base64Encoded: key)?.count == 32 else {
+            return nil
+        }
+        return SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+    }()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = makeMainMenu()
@@ -47,8 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
            event.type == .rightMouseUp ||
            (event.type == .leftMouseUp && event.modifierFlags.contains(.control)) {
             popover.performClose(button)
-            let menu = NSMenu()
-            menu.addItem(withTitle: "Quit Jot", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            let menu = makeAppMenu()
             let bottom = button.isFlipped ? button.bounds.maxY : button.bounds.minY
             menu.popUp(positioning: nil, at: NSPoint(x: button.bounds.minX, y: bottom), in: button)
             return
@@ -66,13 +77,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         focus.makeFirstResponder()
     }
 
+    @objc private func checkForUpdates(_ sender: NSMenuItem) {
+        popover.performClose(nil)
+        updater?.checkForUpdates(sender)
+    }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        menuItem.action != #selector(checkForUpdates(_:)) || updater?.updater.canCheckForUpdates == true
+    }
+
+    private func makeAppMenu() -> NSMenu {
+        let menu = NSMenu()
+        if updater != nil {
+            let check = menu.addItem(withTitle: "Check for Updates…", action: #selector(checkForUpdates(_:)), keyEquivalent: "")
+            check.target = self
+            menu.addItem(.separator())
+        }
+        menu.addItem(withTitle: "Quit Jot", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        return menu
+    }
+
     private func makeMainMenu() -> NSMenu {
         let mainMenu = NSMenu()
         let appItem = NSMenuItem()
         mainMenu.addItem(appItem)
-        let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "Quit Jot", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        appItem.submenu = appMenu
+        appItem.submenu = makeAppMenu()
 
         let editItem = NSMenuItem()
         mainMenu.addItem(editItem)

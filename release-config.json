@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier": "com.scratchpadexperiment.marginjot",
+  "teamIdentifier": "HQVGN3GH6Z",
+  "version": "1.0.1",
+  "build": 3,
+  "feedURL": "https://jot.braksa.xyz/updates/appcast.xml",
+  "sparkleKeychainAccount": "xyz.braksa.jot",
+  "sparklePublicKey": "VwM+EUmM9pNo3hh6plC2u8HDW7eaVhe2O1X7JBym6p4="
+}

@@ -53,11 +53,14 @@ cat > "$bundle/Contents/Info.plist" <<PLIST
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSUIElement</key><true/>
     <key>NSPrincipalClass</key><string>NSApplication</string>
+    <key>SparkleUpdatesEnabled</key><false/>
 </dict>
 </plist>
 PLIST
+python3 "$root/script/macos-sparkle.py" embed "$bundle" "$root/.build"
+cp "$root/LICENSE" "$resources/LICENSE"
 /usr/bin/codesign --force --sign - "$bundle"
-/usr/bin/codesign --verify --strict "$bundle"
+/usr/bin/codesign --verify --deep --strict "$bundle"
 echo "Bundle ready at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 if [[ "$mode" == "--build-only" ]]; then
@@ -88,7 +91,7 @@ staged="$staging/$app_name.app"
 previous="$staging/Previous.app"
 trap 'if [[ ! -e "$previous" ]]; then /bin/rm -rf "$staging"; fi' EXIT
 /usr/bin/ditto "$bundle" "$staged"
-/usr/bin/codesign --verify --strict "$staged"
+/usr/bin/codesign --verify --deep --strict "$staged"
 if [[ -e "$replaced" ]]; then
     /bin/mv "$replaced" "$previous"
 fi
